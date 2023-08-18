@@ -21,8 +21,20 @@ export function ImageProvider({ children }) {
     if (page === 1) {
       setImages([]);
     }
-    fetchImages();
-  }, [ page, searchQuery]);
+    
+    const fetchImages = async () => {
+      const { hits, totalHits } = await getProducts({
+        query: searchQuery,
+        page,
+        per_page,
+      });
+
+      setImages(prevImages => [...prevImages, ...hits]);
+      setTotalHits(totalHits);
+      setLoading(false);
+    };
+    fetchImages()
+  }, [page, per_page, searchQuery]);
 
   const handleSearchQueryChange = newQuery => {
     setSearchQuery(newQuery);
@@ -32,17 +44,7 @@ export function ImageProvider({ children }) {
     setLoading(true);
   };
 
-  const fetchImages = async () => {
-    const { hits, totalHits } = await getProducts({
-      query: searchQuery,
-      page,
-      per_page,
-    });
-
-    setImages(prevImages => [...prevImages, ...hits]);
-    setTotalHits(totalHits);
-    setLoading(false);
-  };
+  
 
   const loadMoreImages = () => {
     setPage(prevPage => prevPage + 1);
